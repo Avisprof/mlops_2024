@@ -1,0 +1,13 @@
+project_uuid: 410305df655a472d98018bb3f2efe2aa
+features:
+  command_center: true
+  compute_management: false
+  custom_design: true
+  interactions: true
+  add_new_block_v2: true
+  global_hooks: true
+  notebook_block_output_split_view: true
+  operation_history: true
+  polars: true
+help_improve_mage:
+pipelines:
