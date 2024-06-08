@@ -9,5 +9,8 @@ features:
   notebook_block_output_split_view: true
   operation_history: true
   polars: true
-help_improve_mage:
+help_improve_mage: false
 pipelines:
+  settings:
+    triggers:
+      save_in_code_automatically: true

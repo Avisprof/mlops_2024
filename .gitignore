@@ -163,3 +163,5 @@ cython_debug/
 mlruns/
 mlartifacts/
 mlflow.db
+mlflow/
+.file_versions/

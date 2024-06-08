@@ -1,0 +1,14 @@
+triggers:
+- description: null
+  envs: []
+  last_enabled_at: 2024-06-08 14:47:18.271876+00:00
+  name: late myth
+  pipeline_uuid: prepare_data
+  schedule_interval: '@once'
+  schedule_type: time
+  settings: null
+  sla: null
+  start_time: 2024-06-07 14:47:00+00:00
+  status: active
+  token: 3304cf5a4420435b84b8ea58f47c344b
+  variables: {}
