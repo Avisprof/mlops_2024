@@ -20,7 +20,6 @@ create_table_statement = """
 drop table if exists ny_taxi_trip_prediction_metrics;
 create table ny_taxi_trip_prediction_metrics(
 	timestamp timestamp,
-	prediction_drift float,
 	quantile_metric float,
 	correlation_metric float
 )
@@ -66,24 +65,21 @@ def prep_db():
 
 @task(retries=2, retry_delay_seconds=5, name="calculate metrics")
 def calculate_metrics_postgresql(curr, i):
+	
 	current_data = raw_data[(raw_data.lpep_pickup_datetime >= (begin + datetime.timedelta(i))) &
 		(raw_data.lpep_pickup_datetime < (begin + datetime.timedelta(i + 1)))]
-
-	#current_data.fillna(0, inplace=True)
-	current_data['prediction'] = model.predict(current_data[num_features + cat_features].fillna(0))
 
 	report.run(reference_data = reference_data, current_data = current_data,
 		column_mapping=column_mapping)
 
 	result = report.as_dict()
 
-	prediction_drift = result['metrics'][0]['result']['drift_score']
 	quantile_metric = result['metrics'][1]['result']['current']['value']
 	correlation_metric = result['metrics'][2]['result']['current']['pearson']['values']['y'][1]
 
 	curr.execute(
-		"insert into ny_taxi_trip_prediction_metrics(timestamp, prediction_drift, quantile_metric, correlation_metric) values (%s, %s, %s, %s)",
-		(begin + datetime.timedelta(i), prediction_drift, quantile_metric, correlation_metric)
+		"insert into ny_taxi_trip_prediction_metrics(timestamp, quantile_metric, correlation_metric) values (%s, %s, %s)",
+		(begin + datetime.timedelta(i), quantile_metric, correlation_metric)
 	)
 
 @flow(name="start monitoring backfill")
