@@ -36,6 +36,7 @@ month = 3
 color = 'green'
 print("Read data")
 raw_data = read_data(color, year, month)
+reference_data = pd.read_parquet('data/reference.parquet')
 
 begin = datetime.datetime(year, month, 1, 0, 0)
 num_features = ['passenger_count', 'trip_distance', 'fare_amount', 'total_amount']
@@ -63,7 +64,7 @@ def prep_db():
 		with psycopg.connect("host=localhost port=5432 dbname=test user=postgres password=pass") as conn:
 			conn.execute(create_table_statement)
 
-@task(retries=2, retry_delay_seconds=5, name="calculate metrics")
+@task(retries=1, retry_delay_seconds=5, name="calculate metrics")
 def calculate_metrics_postgresql(curr, i):
 	
 	current_data = raw_data[(raw_data.lpep_pickup_datetime >= (begin + datetime.timedelta(i))) &
@@ -74,8 +75,8 @@ def calculate_metrics_postgresql(curr, i):
 
 	result = report.as_dict()
 
-	quantile_metric = result['metrics'][1]['result']['current']['value']
-	correlation_metric = result['metrics'][2]['result']['current']['pearson']['values']['y'][1]
+	quantile_metric = result['metrics'][0]['result']['current']['value']
+	correlation_metric = result['metrics'][1]['result']['current']['pearson']['values']['y'][1]
 
 	curr.execute(
 		"insert into ny_taxi_trip_prediction_metrics(timestamp, quantile_metric, correlation_metric) values (%s, %s, %s)",
