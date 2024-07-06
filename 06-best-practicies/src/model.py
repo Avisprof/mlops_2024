@@ -1,10 +1,19 @@
+import os
 import json
 import base64
 
 import mlflow
 
+def get_model_location(run_id):
+    model_location = os.getenv('MODEL_LOCATION')
+    if model_location is None:
+        return f'runs:/{run_id}/model'
+    else:
+        return model_location
+
+
 def load_model(run_id):
-    logged_model = f'runs:/{run_id}/model'
+    logged_model = get_model_location(run_id) 
     model = mlflow.pyfunc.load_model(logged_model)
     return model
 
