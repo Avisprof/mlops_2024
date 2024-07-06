@@ -1,5 +1,5 @@
 import os
-from src.batch import get_input_path
+from batch import get_input_path
 from tests.test_batch import prepare_input_data
 
 S3_ENDPOINT_URL = os.getenv('S3_ENDPOINT_URL')
@@ -20,4 +20,6 @@ df_input.to_parquet(
     storage_options=options
 )
 
-os.system("aws --endpoint-url=http://localhost:4566 s3 ls")  
+os.system("aws --endpoint-url=http://localhost:4566 s3 ls --summarize --recursive s3://nyc-duration")  
+
+os.system("pipenv run python batch.py 2023 1")

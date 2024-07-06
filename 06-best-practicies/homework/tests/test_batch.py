@@ -1,6 +1,6 @@
 import pandas as pd
 from datetime import datetime
-from src.batch import prepare_data
+from batch import prepare_data
 from pandas.testing import assert_frame_equal
 
 def prepare_input_data():

@@ -33,7 +33,8 @@ def main(year, month):
     df_result['predicted_duration'] = y_pred
 
     print(f"Write result to file {output_file}")
-    df_result.to_parquet(output_file, engine='pyarrow', index=False)
+    save_data(df_result, output_file)
+    
 
 def prepare_data(df, categorical):
     df['duration'] = df.tpep_dropoff_datetime - df.tpep_pickup_datetime
@@ -71,6 +72,18 @@ def read_data(filename, categorical):
 
     return prepare_data(df, categorical)    
 
+def save_data(df, filename):
+    S3_ENDPOINT_URL = os.getenv('S3_ENDPOINT_URL')
+    
+    if S3_ENDPOINT_URL is None:
+        df.to_parquet(filename, engine='pyarrow', index=False)
+    else:
+        options = {
+            'client_kwargs': {
+                'endpoint_url': S3_ENDPOINT_URL
+            }
+        }
+        df.to_parquet(filename, storage_options=options)
 
     
 if __name__ == '__main__':

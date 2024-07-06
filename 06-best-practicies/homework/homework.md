@@ -227,6 +227,14 @@ df_input.to_parquet(
 )
 ```
 
+```pipenv run python integration_test.py```
+```
+2024-07-06 19:06:37       3620 in/2023-01.parquet
+
+Total Objects: 1
+   Total Size: 3620
+```
+
 What's the size of the file?
 
 * 3620
@@ -234,10 +242,7 @@ What's the size of the file?
 * 43620
 * 63620
 
-Note: it's important to use the code from the snippet for saving
-the file. Otherwise the size may be different depending on the OS,
-engine and compression. Even if you use this exact snippet, the size
-of your dataframe may still be a bit off. Just select the closest option.
+__Answer__: 3620
 
 
 ## Q6. Finish the integration test
