@@ -212,7 +212,7 @@ and save it.
 
 We will pretend that this is data for January 2023.
 
-Run the `integration_test.py` script. After that, use AWS CLI to verify that the 
+Run the [integration_test.py](/06-best-practicies/homework/integration_test.py) script. After that, use AWS CLI to verify that the 
 file was created. 
 
 Use this snipped for saving the file:
@@ -226,8 +226,10 @@ df_input.to_parquet(
     storage_options=options
 )
 ```
+export S3_ENDPOINT_URL=http://localhost:4566
 
-```pipenv run python integration_test.py```
+```python integration_test.py```
+
 ```
 2024-07-06 19:06:37       3620 in/2023-01.parquet
 
@@ -269,6 +271,17 @@ What's the sum of predicted durations for the test dataframe?
 * 36.28
 * 69.28
 * 81.08
+
+```
+Total Objects: 1
+   Total Size: 3019
+     ride_id  predicted_duration
+0  2023/01_0           23.197149
+1  2023/01_1           13.080101
+Sum of predicted durations 36.28
+```
+Anwser: 36.28
+
 
 
 ## Running the test (ungraded)
