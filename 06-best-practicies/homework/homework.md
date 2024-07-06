@@ -104,6 +104,7 @@ How many rows should be there in the expected dataframe?
 * 3
 * 4
 
+__Answer__: 2
 
 ## Q4. Mocking S3 with Localstack 
 
@@ -117,16 +118,17 @@ localstack, we're only interested in running S3.
 Start the service and test it by creating a bucket where we'll
 keep the output. Let's call it "nyc-duration".
 
+
 With AWS CLI, this is how we create a bucket:
 
 ```bash
-aws s3 mb s3://nyc-duration
+aws --endpoint-url=http://localhost:4566 s3 mb s3://nyc-duration
 ```
 
 Then we need to check that the bucket was successfully created. With AWS, this is how we typically do it:
 
 ```bash
-aws s3 ls
+aws --endpoint-url=http://localhost:4566 s3 ls
 ```
 
 In both cases we should adjust commands for localstack. What option do we need to use for such purposes?
@@ -135,6 +137,8 @@ In both cases we should adjust commands for localstack. What option do we need t
 * `--profile`
 * `--endpoint-url`
 * `--version`
+
+__Answer:__ --endpoint-url
 
 
 ## Make input and output paths configurable
