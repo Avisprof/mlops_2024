@@ -1,11 +1,6 @@
-## Homework
+## Unit and Integration tests
 
-In this homework, we'll take the ride duration prediction model
-that we deployed in batch mode in homework 4 and improve the 
-reliability of our code with unit and integration tests. 
-
-You'll find the starter code in the [homework](homework/) directory.
-
+In this project we'll improve the reliability of our code with unit and integration tests. 
 
 ## Q1. Refactoring
 
@@ -17,19 +12,11 @@ refactor it. We'll start by getting rid of all the global variables.
 * Move all the code (except `read_data`) inside `main`
 * Make `categorical` a parameter for `read_data` and pass it inside `main`
 
+See: [batch.py](/06-best-practicies/homework/batch.py)
+
 Now we need to create the "main" block from which we'll invoke
 the main function. How does the `if` statement that we use for
 this looks like? 
-
-
-Hint: after refactoring, check that the code still works. Just run it e.g. for March 2023 and see if it finishes successfully. 
-
-To make it easier to run it, you can write results to your local
-filesystem. E.g. here:
-
-```python
-output_file = f'taxi_type=yellow_year={year:04d}_month={month:02d}.parquet'
-```
 
 __Answer__: `if __name__ == '__main__':`
 
@@ -45,9 +32,6 @@ Next, create a folder `tests` and create two files. One will be
 the file with tests. We can name it `test_batch.py`. 
 
 What should be the other file? 
-
-Hint: to be able to test `batch.py`, we need to be able to
-import it. Without this other file, we won't be able to do it.
 
 __Answer__: `__init__.py`
 
@@ -65,44 +49,12 @@ code into two parts: reading (I/O) and transformation.
 So let's create a function `prepare_data` that takes in a dataframe 
 (and some other parameters too) and applies some transformation to it.
 
-(That's basically the entire `read_data` function after reading 
-the parquet file)
-
-Now create a test and use this as input:
-
-```python
-data = [
-    (None, None, dt(1, 1), dt(1, 10)),
-    (1, 1, dt(1, 2), dt(1, 10)),
-    (1, None, dt(1, 2, 0), dt(1, 2, 59)),
-    (3, 4, dt(1, 2, 0), dt(2, 2, 1)),      
-]
-
-columns = ['PULocationID', 'DOLocationID', 'tpep_pickup_datetime', 'tpep_dropoff_datetime']
-df = pd.DataFrame(data, columns=columns)
-```
-
-Where `dt` is a helper function:
-
-```python
-from datetime import datetime
-
-def dt(hour, minute, second=0):
-    return datetime(2023, 1, 1, hour, minute, second)
-```
-
 Define the expected output and use the assert to make sure 
 that the actual dataframe matches the expected one.
 
-Tip: When you compare two Pandas DataFrames, the result is also a DataFrame.
-The same is true for Pandas Series. Also, a DataFrame could be turned into a list of dictionaries.  
+See: [test_batch.py](/06-best-practicies/homework/tests/test_batch.py)
 
 How many rows should be there in the expected dataframe?
-
-* 1
-* 2
-* 3
-* 4
 
 __Answer__: 2
 
@@ -118,6 +70,11 @@ localstack, we're only interested in running S3.
 Start the service and test it by creating a bucket where we'll
 keep the output. Let's call it "nyc-duration".
 
+See [docker-compose.yml](/06-best-practicies/homework/docker-compose.yml)
+
+```bash
+docker compose up -d
+```
 
 With AWS CLI, this is how we create a bucket:
 
@@ -132,11 +89,6 @@ aws --endpoint-url=http://localhost:4566 s3 ls
 ```
 
 In both cases we should adjust commands for localstack. What option do we need to use for such purposes?
-
-* `--backend-store-uri`
-* `--profile`
-* `--endpoint-url`
-* `--version`
 
 __Answer:__ --endpoint-url
 
@@ -153,6 +105,7 @@ variables. Let's do that:
 ```bash
 export INPUT_FILE_PATTERN="s3://nyc-duration/in/{year:04d}-{month:02d}.parquet"
 export OUTPUT_FILE_PATTERN="s3://nyc-duration/out/{year:04d}-{month:02d}.parquet"
+export S3_ENDPOINT_URL=http://localhost:4566
 ```
 
 And this is how we can read them:
@@ -201,6 +154,8 @@ Let's modify our `read_data` function:
 - check if `S3_ENDPOINT_URL` is set, and if it is, use it for reading
 - otherwise use the usual way
 
+See [batch.py](/06-best-practicies/homework/batch.py)
+
 
 ## Q5. Creating test data
 
@@ -212,8 +167,7 @@ and save it.
 
 We will pretend that this is data for January 2023.
 
-Run the [integration_test.py](/06-best-practicies/homework/integration_test.py) script. After that, use AWS CLI to verify that the 
-file was created. 
+Run the [integration_test.py](/06-best-practicies/homework/integration_test.py) script. After that, use AWS CLI to verify that the file was created. 
 
 Use this snipped for saving the file:
 
@@ -226,10 +180,12 @@ df_input.to_parquet(
     storage_options=options
 )
 ```
-export S3_ENDPOINT_URL=http://localhost:4566
 
-```python integration_test.py```
+```bash
+python integration_test.py
+```
 
+Ouput:
 ```
 2024-07-06 19:06:37       3620 in/2023-01.parquet
 
@@ -238,11 +194,6 @@ Total Objects: 1
 ```
 
 What's the size of the file?
-
-* 3620
-* 23620
-* 43620
-* 63620
 
 __Answer__: 3620
 
@@ -265,12 +216,9 @@ Now it saves the result to localstack.
 The only thing we need to do now is to read this data and 
 verify the result is correct. 
 
-What's the sum of predicted durations for the test dataframe?
+See [integration_test.py](/06-best-practicies/homework/integration_test.py)
 
-* 13.08
-* 36.28
-* 69.28
-* 81.08
+What's the sum of predicted durations for the test dataframe?
 
 ```
 Total Objects: 1
@@ -280,18 +228,13 @@ Total Objects: 1
 1  2023/01_1           13.080101
 Sum of predicted durations 36.28
 ```
-Anwser: 36.28
-
+__Anwser:__ 36.28
 
 
 ## Running the test (ungraded)
 
 The rest is ready, but we need to write a shell script for doing 
-that: [run.sh](/06-best-practicies/homework/run.sh)
+that.
 
+See: [run.sh](/06-best-practicies/homework/run.sh)
 
-
-## Submit the results
-
-* Submit your results here: https://courses.datatalks.club/mlops-zoomcamp-2024/homework/hw6
-* It's possible that your answers won't match exactly. If it's the case, select the closest one.
