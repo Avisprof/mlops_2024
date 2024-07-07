@@ -287,9 +287,8 @@ Anwser: 36.28
 ## Running the test (ungraded)
 
 The rest is ready, but we need to write a shell script for doing 
-that. 
+that: [run.sh](/06-best-practicies/homework/run.sh)
 
-Let's do that!
 
 
 ## Submit the results
